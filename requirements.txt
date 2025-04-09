@@ -1,0 +1,7 @@
+flask
+torch
+Pillow
+werkzeug
+matplotlib
+torchvision
+numpy<2
