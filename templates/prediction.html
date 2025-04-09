@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <link
+      href="{{ url_for('static', filename='css/prediction.css') }}"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <h1>Prediction Result</h1>
+    <a href="{{ url_for('home') }}">Home</a>
+    <main>
+      <div>
+        <img
+          src="{{ image_url }}"
+          alt="Uploaded Image"
+          style="max-width: 300px"
+        />
+      </div>
+      <div>
+        <canvas id="pieChart" width="400px" height="400px"></canvas>
+      </div>
+    </main>
+    <script>
+      const { results } = JSON.parse(`{{ predictions | safe }}`);
+      const ctx = document.getElementById("pieChart").getContext("2d");
+      const labels = results.map((item) => `${item.breed} ${item.confidence}%`);
+      const confidences = results.map((item) => parseFloat(item.confidence));
+      new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              data: confidences,
+              backgroundColor: [
+                "#A3D8F4",
+                "#FFDAB9",
+                "#98FB98",
+                "#E6E6FA",
+                "#FFFACD",
+              ],
+              hoverBackgroundColor: [
+                "#7AC8E5",
+                "#FFB07A",
+                "#66CDAA",
+                "#DDA0DD",
+                "#FAFAD2",
+              ],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return tooltipItem.label + ": " + tooltipItem.raw + "%";
+                },
+              },
+            },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

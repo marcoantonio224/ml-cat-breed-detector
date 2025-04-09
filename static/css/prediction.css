@@ -1,0 +1,16 @@
+body {
+  text-align: center;
+  padding: 2%;
+}
+main {
+  text-align: center;
+  width: fit-content;
+  display: grid;
+  grid-auto-flow: column;
+  margin: 30px auto;
+  gap: 100px;
+}
+
+img {
+  max-width: 500px;
+}

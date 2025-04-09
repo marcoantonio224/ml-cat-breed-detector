@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat Breed Detector</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <link
+      href="{{ url_for('static', filename='css/index.css') }}"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <h1 style="text-align: center">Cat Breed Detector</h1>
+    <div>
+      <h4>Please select a cat image to upload</h4>
+      <form action="/predict" method="post" enctype="multipart/form-data">
+        <input
+          type="file"
+          name="file"
+          accept="image/*"
+          onchange="previewImage(this)"
+          required
+          class="form-control"
+        />
+        <button type="submit" class="btn btn-primary">Upload and Detect</button>
+      </form>
+      <img
+        id="imagePreview"
+        src=""
+        alt="Image Preview"
+        style="max-width: 300px; display: none"
+      />
+    </div>
+
+    <div class="visual-one">
+      <h4>Training Data for Machine Learning Model</h4>
+      <p>
+        This bar graph represents the distribution of images across different
+        cat breeds used to train the model. Each bar shows the number of images
+        available for a specific breed, providing insights into the dataset's
+        composition and helping to visualize the class balance for the model's
+        training process.
+      </p>
+      <canvas id="classChart" width="800" height="400"></canvas>
+    </div>
+    <script>
+      function previewImage(input) {
+        const fileImg = input.files[0];
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          const preview = document.getElementById("imagePreview");
+          preview.src = reader.result;
+          preview.style.display = "block";
+        };
+        if (fileImg) {
+          reader.readAsDataURL(fileImg);
+        }
+      }
+      // Render breed training data
+      const breedTrainingData = JSON.parse(`{{ training_data | safe }}`);
+      const classNames = Object.keys(breedTrainingData);
+      const imageCounts = Object.values(breedTrainingData);
+      const ctx = document.getElementById("classChart").getContext("2d");
+      const classChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: classNames,
+          datasets: [
+            {
+              label: "Number of Images per Breed",
+              data: imageCounts,
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 50,
+              },
+            },
+            x: {
+              ticks: {
+                maxRotation: 90,
+                minRotation: 45,
+              },
+            },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

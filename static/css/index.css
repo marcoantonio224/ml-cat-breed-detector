@@ -1,0 +1,22 @@
+body {
+  padding: 2%;
+}
+
+form {
+  display: grid;
+  width: fit-content;
+}
+
+img {
+  margin-top: 1%;
+  max-width: 500px;
+}
+
+button {
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+.visual-one {
+  margin-top: 3%;
+}
