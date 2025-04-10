@@ -7,9 +7,15 @@ form {
   width: fit-content;
 }
 
+#uploadContainer {
+  display: grid;
+  place-items: center;
+}
+
 img {
   margin-top: 1%;
   max-width: 500px;
+  border: 1px solid #eee;
 }
 
 button {
@@ -19,4 +25,12 @@ button {
 
 .visual-one {
   margin-top: 3%;
+}
+
+h3 {
+  text-align: center;
+}
+
+#averageAccuracy {
+  color: rgb(37 176 176);
 }

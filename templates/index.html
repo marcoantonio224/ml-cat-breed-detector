@@ -17,38 +17,65 @@
   </head>
   <body>
     <h1 style="text-align: center">Cat Breed Detector</h1>
-    <div>
-      <h4>Please select a cat image to upload</h4>
-      <form action="/predict" method="post" enctype="multipart/form-data">
-        <input
-          type="file"
-          name="file"
-          accept="image/*"
-          onchange="previewImage(this)"
-          required
-          class="form-control"
-        />
-        <button type="submit" class="btn btn-primary">Upload and Detect</button>
-      </form>
-      <img
-        id="imagePreview"
-        src=""
-        alt="Image Preview"
-        style="max-width: 300px; display: none"
-      />
-    </div>
-
-    <div class="visual-one">
-      <h4>Training Data for Machine Learning Model</h4>
-      <p>
-        This bar graph represents the distribution of images across different
-        cat breeds used to train the model. Each bar shows the number of images
-        available for a specific breed, providing insights into the dataset's
-        composition and helping to visualize the class balance for the model's
-        training process.
-      </p>
-      <canvas id="classChart" width="800" height="400"></canvas>
-    </div>
+    <main>
+      <div>
+        <div id="uploadContainer">
+          <h4>Please select a cat image to upload</h4>
+          <form action="/predict" method="post" enctype="multipart/form-data">
+            <input
+              type="file"
+              name="file"
+              accept="image/*"
+              onchange="previewImage(this)"
+              required
+              class="form-control"
+            />
+            <button type="submit" class="btn btn-primary">
+              Upload and Detect
+            </button>
+          </form>
+          <img
+            id="imagePreview"
+            src=""
+            alt="Image Preview"
+            style="max-width: 300px; display: none"
+          />
+        </div>
+        <hr />
+        <div>
+          <h3>Confidence vs Accuracy</h3>
+          <canvas id="lineChart" width="400" height="200"></canvas>
+          <p>
+            This model has been known to have at least
+            <b><span id="averageAccuracy"></span></b> of accuracy. The line
+            chart displays the relationship between accuracy and confidence for
+            the cat breed detection model. Accuracy represents the proportion of
+            correct predictions made by the model, where a value of 100
+            indicates a correct prediction and 0 represents an incorrect one.
+            Confidence, on the other hand, measures the model's certainty in its
+            predictions, expressed as a percentage ranging from 0 to 100. Each
+            point on the line chart corresponds to a prediction made by the
+            model, with the x-axis representing the confidence level and the
+            y-axis representing whether the prediction was correct (100) or
+            incorrect (0). This chart helps visualize how the model's confidence
+            correlates with its accuracy, providing insights into the model's
+            reliability at various levels of certainty.
+          </p>
+        </div>
+      </div>
+      <hr />
+      <div class="visual-one">
+        <h3>Training Data for Machine Learning Model</h3>
+        <p>
+          This bar graph represents the distribution of images across different
+          cat breeds used to train the model. Each bar shows the number of
+          images available for a specific breed, providing insights into the
+          dataset's composition and helping to visualize the class balance for
+          the model's training process.
+        </p>
+        <canvas id="classChart" width="800" height="400"></canvas>
+      </div>
+    </main>
     <script>
       function previewImage(input) {
         const fileImg = input.files[0];
@@ -95,6 +122,58 @@
                 maxRotation: 90,
                 minRotation: 45,
               },
+            },
+          },
+        },
+      });
+
+      // Create a line chart
+      const {
+        accuracies,
+        confidences,
+        average_accuracy: averageAccuracy,
+      } = JSON.parse(`{{ line_chart_data | safe }}`);
+      const averageAccuracyEle = document.getElementById("averageAccuracy");
+      averageAccuracyEle.innerText = `${(averageAccuracy * 100).toFixed()}%`;
+      const lineChartCtx = document
+        .getElementById("lineChart")
+        .getContext("2d");
+      const lineChart = new Chart(lineChartCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: confidences.length }, (_, i) => i + 1),
+          datasets: [
+            {
+              label: "Confidence (%)",
+              data: confidences,
+              borderColor: "rgba(54, 162, 235, 1)",
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              fill: true,
+              tension: 0.1,
+            },
+            {
+              label: `Accuracy (0 or 100)`,
+              data: accuracies,
+              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              fill: false,
+              tension: 0.1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 10,
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              position: "top",
             },
           },
         },

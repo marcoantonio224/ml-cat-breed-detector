@@ -2,12 +2,15 @@ import os
 import json
 from werkzeug.utils import secure_filename
 from flask import Flask, request, jsonify, render_template, send_from_directory, url_for
-from breed_detector_model import predict_breed, get_training_data
+from breed_detector_model import predict_breed, get_training_data, get_accuracy_and_confidence_list
 
 app = Flask(__name__)
 
 # Define allowed file extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Preload accuracy vs confidence data
+accuracies, confidences, average_accuracy = get_accuracy_and_confidence_list()
 
 
 # Function to check allowed file types
@@ -18,7 +21,15 @@ def allowed_file(filename):
 @app.route("/")
 def home():
     training_data = get_training_data()
-    return render_template('index.html', training_data=json.dumps(training_data))
+    return render_template(
+        'index.html',
+        training_data=json.dumps(training_data),
+        line_chart_data=json.dumps({
+            "accuracies": accuracies,
+            "confidences": confidences,
+            "average_accuracy": average_accuracy
+        })
+    )
 
 
 @app.route('/predict', methods=['POST'])
@@ -43,7 +54,7 @@ def predict():
                 continue
             predictions.append({"breed": breed, "confidence": str(confidence)})
         # Generate the URL for the uploaded image
-        image_url = url_for('uploaded_file', filename=filename)      
+        image_url = url_for('uploaded_file', filename=filename)
         return render_template(
             'prediction.html',
             image_url=image_url,
@@ -59,4 +70,4 @@ def uploaded_file(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)

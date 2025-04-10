@@ -1,4 +1,5 @@
 import torch
+import random
 import torch.nn.functional as F
 import torch.nn as nn
 from PIL import Image
@@ -14,10 +15,16 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
-DATASET_DIR = './cat_dataset/train'
+DATASET_TRAIN_DIR = './cat_dataset/train'
+DATASET_TEST_DIR = './cat_dataset/test'
+TOTAL_RANDOM_IMAGES = 25
 
 # Load training data
-train_dataset = ImageFolder(root=DATASET_DIR, transform=transform)
+train_dataset = ImageFolder(root=DATASET_TRAIN_DIR, transform=transform)
+
+# Load test data set
+test_dataset = ImageFolder(root=DATASET_TEST_DIR, transform=transform)
+random_images = random.sample(test_dataset.imgs, TOTAL_RANDOM_IMAGES)
 
 # Load a pre-trained ResNet18 model
 model = models.resnet18(pretrained=True)
@@ -37,6 +44,28 @@ def get_training_data():
     breed = train_dataset.classes
     breed_img_count = {breed[i]: num_of_imgs[i] for i in range(len(breed))}
     return breed_img_count
+
+
+def get_accuracy_and_confidence_list():
+    confidences = []
+    accuracies = []
+    accuracy_count = 0
+    for img_path, label in random_images:
+        image = Image.open(img_path).convert("RGB")
+        image = transform(image).unsqueeze(0).to(device)
+        outputs = model(image)
+        probabilities = F.softmax(outputs, dim=1)
+        top_probs, top_classes = torch.topk(probabilities, 3)
+        top_confidence = top_probs[0][0].item() * 100
+        predicted_class = top_classes[0][0].item()
+        accuracy = 0
+        if predicted_class == label:
+            accuracy = 100
+            accuracy_count += 1
+        average_accuracy = accuracy_count / TOTAL_RANDOM_IMAGES
+        accuracies.append(accuracy)
+        confidences.append(top_confidence)
+    return accuracies, confidences, average_accuracy
 
 
 def predict_breed(img_path):
