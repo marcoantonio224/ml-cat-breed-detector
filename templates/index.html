@@ -75,6 +75,8 @@
         }
       }
       // Render breed training data
+      // Referenced code from Chart.js:
+      // https://www.chartjs.org/docs/latest/charts/bar.html
       const breedTrainingData = JSON.parse(`{{ training_data | safe }}`);
       const classNames = Object.keys(breedTrainingData);
       const imageCounts = Object.values(breedTrainingData);
@@ -113,6 +115,8 @@
       });
 
       // Create a line chart
+      // Referenced code from Chart.js:
+      // https://www.chartjs.org/docs/latest/charts/line.html
       const {
         accuracies,
         confidences,

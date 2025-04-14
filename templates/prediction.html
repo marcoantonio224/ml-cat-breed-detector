@@ -31,6 +31,9 @@
       </div>
     </main>
     <script>
+      // Create Pie Chart
+      // Referenced code from Chart.js:
+      // https://www.chartjs.org/docs/latest/charts/doughnut.html#pie
       const { results } = JSON.parse(`{{ predictions | safe }}`);
       const ctx = document.getElementById("pieChart").getContext("2d");
       const labels = results.map((item) => `${item.breed} ${item.confidence}%`);
