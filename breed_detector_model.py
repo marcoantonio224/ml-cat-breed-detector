@@ -4,15 +4,18 @@ import torch.nn.functional as F
 import torch.nn as nn
 from PIL import Image
 from torchvision.datasets import ImageFolder
+from torchvision.models import resnet18, ResNet18_Weights
 from torchvision import transforms
-from torchvision import models
 from collections import Counter
 
 # Define image transformations
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
 ])
 
 DATASET_TRAIN_DIR = './cat_dataset/train'
@@ -27,14 +30,15 @@ test_dataset = ImageFolder(root=DATASET_TEST_DIR, transform=transform)
 random_images = random.sample(test_dataset.imgs, TOTAL_RANDOM_IMAGES)
 
 # Load a pre-trained ResNet18 model
-model = models.resnet18(pretrained=True)
+weights = ResNet18_Weights.DEFAULT
+model = resnet18(weights=weights)
 num_classes = len(train_dataset.classes)
 model.fc = nn.Linear(model.fc.in_features, num_classes)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 # Load the cat detecting model into application
-model.load_state_dict(torch.load("cat_breed_model.pth"))
+model.load_state_dict(torch.load("cat_breed_detector_model.pth"))
 model.to(device)
 model.eval()
 
@@ -57,9 +61,10 @@ def get_accuracy_and_confidence_list():
         probabilities = F.softmax(outputs, dim=1)
         top_probs, top_classes = torch.topk(probabilities, 3)
         top_confidence = top_probs[0][0].item() * 100
-        predicted_class = top_classes[0][0].item()
         accuracy = 0
-        if predicted_class == label:
+        # Check if the breed is in top classes
+        # predicted by the modal
+        if label in top_classes:
             accuracy = 100
             accuracy_count += 1
         average_accuracy = accuracy_count / TOTAL_RANDOM_IMAGES
