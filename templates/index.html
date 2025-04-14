@@ -45,22 +45,6 @@
         <div>
           <h3>Confidence vs Accuracy</h3>
           <canvas id="lineChart" width="400" height="200"></canvas>
-          <p>
-            This model has been known to have at least
-            <b><span id="averageAccuracy"></span></b> of accuracy. The line
-            chart displays the relationship between accuracy and confidence for
-            the cat breed detection model. Accuracy represents the proportion of
-            correct predictions made by the model, where a value of 100
-            indicates a correct prediction and 0 represents an incorrect one.
-            Confidence, on the other hand, measures the model's certainty in its
-            predictions, expressed as a percentage ranging from 0 to 100. Each
-            point on the line chart corresponds to a prediction made by the
-            model, with the x-axis representing the confidence level and the
-            y-axis representing whether the prediction was correct (100) or
-            incorrect (0). This chart helps visualize how the model's confidence
-            correlates with its accuracy, providing insights into the model's
-            reliability at various levels of certainty.
-          </p>
         </div>
       </div>
       <hr />
@@ -71,7 +55,8 @@
           cat breeds used to train the model. Each bar shows the number of
           images available for a specific breed, providing insights into the
           dataset's composition and helping to visualize the class balance for
-          the model's training process.
+          the model's training process. This model has been calculated to have
+          <b><span id="averageAccuracy"></span></b> of accuracy.
         </p>
         <canvas id="classChart" width="800" height="400"></canvas>
       </div>
